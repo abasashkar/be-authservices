@@ -1,0 +1,22 @@
+{
+    "sourceFile": "prisma/schema.prisma",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1771169876015,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1771169924293,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -6,55 +6,17 @@\n   provider = \"postgresql\"\n   url      = env(\"DATABASE_URL\")\n }\n \n-model Teacher {\n+model User {\n   id        String   @id @default(uuid())\n-  name      String\n   email     String   @unique\n-  classes   Class[]\n+  password  String\n+  role      Role     @default(STUDENT)\n   createdAt DateTime @default(now())\n }\n \n-model Class {\n-  id         String    @id @default(uuid())\n-  name       String\n-  teacherId  String\n-  teacher    Teacher   @relation(fields: [teacherId], references: [id])\n-  students   Student[]\n-  records    AttendanceRecord[]\n-  createdAt  DateTime  @default(now())\n+enum Role {\n+  ADMIN\n+  TEACHER\n+  STUDENT\n }\n-\n-model Student {\n-  id        String   @id @default(uuid())\n-  name      String\n-  classId   String\n-  class     Class    @relation(fields: [classId], references: [id])\n-  entries   AttendanceEntry[]\n-  createdAt DateTime @default(now())\n-}\n-\n-model AttendanceRecord {\n-  id        String   @id @default(uuid())\n-  classId   String\n-  class     Class    @relation(fields: [classId], references: [id])\n-  date      DateTime\n-  entries   AttendanceEntry[]\n-  createdAt DateTime @default(now())\n-\n-  @@unique([classId, date])\n-}\n-\n-model AttendanceEntry {\n-  id          String   @id @default(uuid())\n-  recordId    String\n-  studentId   String\n-  status      String\n-  synced      Boolean  @default(false)\n-  updatedAt   DateTime @updatedAt\n-\n-  record      AttendanceRecord @relation(fields: [recordId], references: [id])\n-  student     Student          @relation(fields: [studentId], references: [id])\n-\n-  @@unique([recordId, studentId])\n-}\n"
+                }
+            ],
+            "date": 1771169876015,
+            "name": "Commit-0",
+            "content": "generator client {\n  provider = \"prisma-client-js\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel Teacher {\n  id        String   @id @default(uuid())\n  name      String\n  email     String   @unique\n  classes   Class[]\n  createdAt DateTime @default(now())\n}\n\nmodel Class {\n  id         String    @id @default(uuid())\n  name       String\n  teacherId  String\n  teacher    Teacher   @relation(fields: [teacherId], references: [id])\n  students   Student[]\n  records    AttendanceRecord[]\n  createdAt  DateTime  @default(now())\n}\n\nmodel Student {\n  id        String   @id @default(uuid())\n  name      String\n  classId   String\n  class     Class    @relation(fields: [classId], references: [id])\n  entries   AttendanceEntry[]\n  createdAt DateTime @default(now())\n}\n\nmodel AttendanceRecord {\n  id        String   @id @default(uuid())\n  classId   String\n  class     Class    @relation(fields: [classId], references: [id])\n  date      DateTime\n  entries   AttendanceEntry[]\n  createdAt DateTime @default(now())\n\n  @@unique([classId, date])\n}\n\nmodel AttendanceEntry {\n  id          String   @id @default(uuid())\n  recordId    String\n  studentId   String\n  status      String\n  synced      Boolean  @default(false)\n  updatedAt   DateTime @updatedAt\n\n  record      AttendanceRecord @relation(fields: [recordId], references: [id])\n  student     Student          @relation(fields: [studentId], references: [id])\n\n  @@unique([recordId, studentId])\n}\n"
+        }
+    ]
+}

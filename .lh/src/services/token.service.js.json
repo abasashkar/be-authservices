@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/services/token.service.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1771166988573,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1771166988573,
+            "name": "Commit-0",
+            "content": "const jwt = require('jsonwebtoken');\nconst redis = require('../config/redis');\nconst ApiError = require('../utils/ApiError');\n\nexports.generateTokens = async (user) => {\n  const accessToken = jwt.sign(\n    { id: user.id, role: user.role },\n    process.env.JWT_ACCESS_SECRET,\n   { expiresIn: process.env.JWT_ACCESS_EXPIRES_IN }\n\n  );\n\n  const refreshToken = jwt.sign(\n    { id: user.id },\n    process.env.JWT_REFRESH_SECRET,\n    { expiresIn: process.env.REFRESH_TOKEN_EXPIRY }\n  );\n\n  await redis.set(\n    `refresh:${user.id}`,\n    refreshToken,\n    'EX',\n    7 * 24 * 60 * 60\n  );\n\n  return { accessToken, refreshToken };\n};\n\nexports.verifyRefreshToken = async (token) => {\n  if (!token) {\n    throw new ApiError(401, 'Refresh token required');\n  }\n\n  let payload;\n\n  try {\n    payload = jwt.verify(token, process.env.JWT_REFRESH_SECRET);\n  } catch (err) {\n    throw new ApiError(401, 'Invalid or expired refresh token');\n  }\n\n  const stored = await redis.get(`refresh:${payload.id}`);\n\n  if (!stored || stored !== token) {\n    throw new ApiError(401, 'Invalid refresh token');\n  }\n\n  return payload.id;\n};\n"
+        }
+    ]
+}

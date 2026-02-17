@@ -3,41 +3,49 @@ const prisma = require('../config/db'); // points to ../config/db.js
 const { hashPassword, comparePassword } = require('../utils/hash');
 const { generateTokens, verifyRefreshToken } = require('../services/token.service');
 const ApiError = require('../utils/ApiError');
+const axios = require('axios');
 exports.register = async (req, res, next) => {
   try {
     const { email, password, role } = req.body;
 
-    // Basic validation
     if (!email || !password) {
       return next(new ApiError(400, 'Email and password are required'));
     }
 
-    // Validate role, default to STUDENT
     const validRoles = ['ADMIN', 'TEACHER', 'STUDENT'];
     const userRole = role?.toUpperCase() || 'STUDENT';
+
     if (!validRoles.includes(userRole)) {
       return next(new ApiError(400, 'Invalid role'));
     }
 
-    // Check if user already exists
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
-      return next(new ApiError(400, 'User with this email already exists'));
+      return next(new ApiError(400, 'User already exists'));
     }
 
-    // Hash password
     const hashed = await hashPassword(password);
 
-    // Create user
-    const user = await prisma.user.create({
-      data: {
-        email,
-        password: hashed,
-        role: userRole,
-      },
-    });
+const user = await prisma.user.create({
+  data: {
+    email,
+    password: hashed,
+    role: userRole,
+  },
+});
 
-    // Respond with user info (excluding password)
+if (user.role === 'TEACHER') {
+  try {
+    await axios.post('http://attendance-service:3001/internal/teachers', {
+      id: user.id,
+      name: email.split('@')[0]
+    });
+  } catch (err) {
+    console.error('Attendance sync failed:', err.message);
+  }
+}
+
+
     res.status(201).json({
       message: 'User registered successfully',
       user: {
@@ -47,8 +55,8 @@ exports.register = async (req, res, next) => {
         createdAt: user.createdAt,
       },
     });
+
   } catch (e) {
-    console.error('Register error:', e); // <-- debug full error
     next(new ApiError(500, 'Something went wrong during registration'));
   }
 };

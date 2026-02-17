@@ -1,0 +1,22 @@
+{
+    "sourceFile": "src/server.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1771167279903,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1771167287978,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,9 +1,8 @@\n \n require('dotenv').config();\n \n const express = require('express');\n-const app = express();\n \n const app = require('./app');\n \n const PORT = process.env.PORT || 4001;\n"
+                }
+            ],
+            "date": 1771167279903,
+            "name": "Commit-0",
+            "content": "\nrequire('dotenv').config();\n\nconst express = require('express');\nconst app = express();\n\nconst app = require('./app');\n\nconst PORT = process.env.PORT || 4001;\n\napp.listen(PORT, () => {\n  console.log(`Auth Service running on ${PORT}`);\n});\n"
+        }
+    ]
+}
