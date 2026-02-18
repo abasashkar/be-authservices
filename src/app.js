@@ -9,6 +9,7 @@ app.use(express.json());
 
 // Routes
 app.use('/auth', require('./routes/auth.routes'));
+app.use('/internal', require('./routes/internal.routes'));
 
 // Error handler (must be last)
 app.use(errorHandler);
